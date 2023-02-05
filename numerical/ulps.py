@@ -65,17 +65,20 @@ def ulps(x, y):
         glb /= base
         exp_y -= 1
 
-    print(f"exp x: {exp_x}, exp y: {exp_y}")
+    # print(f"exp x: {exp_x}, exp y: {exp_y}")
 
-    if (exp_x == 0 or exp_x == exp_y):
+    if exp_x == 0 or exp_x == exp_y:
         diff = (y - x) / eps
         return int(diff * (base ** exp_x))
+
     if exp_x + 1 == exp_y:
-        return int((y * base ** exp_y) / eps + (x * base ** exp_x) / eps)
-    intervals = int((y * base ** exp_y) / eps + (x * base ** exp_x) / eps)
+        diff = ((y *  (base ** exp_y)) - (x * (base ** exp_x))) / eps
+        return int(diff)
+    diff = ((y - x) / eps) * (base ** exp_y)
+    intervals = (x * base ** exp_x) / eps
     for exp in range(exp_x + 1, exp_y):
         intervals += int((x * base ** exp) / eps)
-    return intervals
+    return int(intervals + diff)
 
 def main():
     testUlps()
