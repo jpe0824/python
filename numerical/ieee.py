@@ -95,7 +95,7 @@ def ulp(x):
 
 def ulps(x, y):
     # returns the number of intervals between x and y by taking advantage of the IEEE standard
-    return abs(struct.unpack('!q', struct.pack('!d', x - y))[0])
+    return
 
 def main():
     testIEEE()
