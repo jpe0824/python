@@ -50,19 +50,19 @@ def sign(x):
 def exponent(x):
     # returns the unbiased (true) binary exponent of x as a decimal integer. Remember that
     # subnormals are a special case. Consider 0 to be a subnormal.
-    # if x == 0:
-    #     return 0
-    # elif math.isnan(x) or math.isinf(x):
-    #     return 1024
-    # else:
-    #     f = struct.unpack('!d', struct.pack('!d', x))[0]
-    #     e = (f >> 52) & 0x7ff
-    #     if e == 0:
-    #         e = -1022
-    #     else:
-    #         e -= 1023
-    #     return e
-    pass
+    if x == 0:
+        return 0
+    elif math.isnan(x) or math.isinf(x):
+        return 1024
+    else:
+        f = struct.unpack('Q', struct.pack('d', x))[0]
+        e = (f >> 52) & 0x7ff
+        if e == 0:
+            e = -1022
+        else:
+            e -= 1023
+        return e
+    # pass
 
 def fraction(x):
     # returns the IEEE fractional part of x as a decimal floating-point number. You must convert
@@ -70,7 +70,7 @@ def fraction(x):
     if x == 0:
         return 0.0
     else:
-        f = struct.unpack('!d', struct.pack('!d', x))[0]
+        f = struct.unpack('Q', struct.pack('d', x))[0]
         fraction = f & 0xfffffffffffff
         fraction /= (1 << 52)
         return fraction
@@ -78,8 +78,14 @@ def fraction(x):
 def mantissa(x):
     # returns the full IEEE mantissa of x as a decimal floating-point number (which is the same as
     # fraction() + 1  for normalized numbers; same as fraction() for subnormals).
-    # return fraction(x) + 1 if exponent(x) != -1022 else fraction(x)
-    pass
+    if(exponent(x) == 0):
+        man = fraction(x)
+        return man
+    if(exponent(x) != -1022):
+        man = fraction(x) + 1
+        return man
+    man = fraction(x)
+    return man
 
 def is_posinfinity(x):
     # returns true if x is positive infinity
@@ -95,7 +101,7 @@ def ulp(x):
 
 def ulps(x, y):
     # returns the number of intervals between x and y by taking advantage of the IEEE standard
-    return
+    return 
 
 def main():
     testIEEE()
