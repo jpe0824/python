@@ -43,10 +43,7 @@ def ulps(x, y):
         return inf
     x = abs(x)
     y = abs(y)
-    exp_x = 0
-    exp_y = 0
-    lub = 1
-    glb = 1
+    exp_x, exp_y, lub, glb = 0, 0, 1, 1
 
     if x > y:
         x, y = y, x
@@ -65,20 +62,20 @@ def ulps(x, y):
         glb /= base
         exp_y -= 1
 
-    # print(f"exp x: {exp_x}, exp y: {exp_y}")
-
-    if exp_x == 0 or exp_x == exp_y:
-        diff = (y - x) / eps
-        return int(diff * (base ** exp_x))
-
-    if exp_x + 1 == exp_y:
-        diff = ((y *  (base ** exp_y)) - (x * (base ** exp_x))) / eps
-        return int(diff)
-    diff = ((y - x) / eps) * (base ** exp_y)
-    intervals = (x * base ** exp_x) / eps
-    for exp in range(exp_x + 1, exp_y):
-        intervals += int((x * base ** exp) / eps)
-    return int(intervals + diff)
+    tot_ulps = 0
+    tmp = exp_x
+    while True:
+        if tmp < exp_y:
+            if tmp == exp_x:
+                tot_ulps = ((base ** (exp_x + 1)) - x)/(eps * (base ** exp_x))
+            else:
+                tot_ulps += (base - 1) * (base ** (prec - 1))
+            tmp += 1
+        else:
+            space = eps * (base ** exp_y)
+            tot_ulps += (y - (base ** exp_y)) / space
+            break
+    return tot_ulps
 
 def main():
     testUlps()
