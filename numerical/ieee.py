@@ -1,6 +1,10 @@
 import math
 import numpy as np
 import struct
+import sys
+
+eps = sys.float_info.epsilon
+inf = math.inf
 
 test_pass = 0
 
@@ -67,41 +71,59 @@ def exponent(x):
 def fraction(x):
     # returns the IEEE fractional part of x as a decimal floating-point number. You must convert
     # binary to decimal. The fraction portion does not include the leading 1 that is not stored.
-    if x == 0:
-        return 0.0
-    else:
-        f = struct.unpack('Q', struct.pack('d', x))[0]
-        fraction = f & 0xfffffffffffff
-        fraction /= (1 << 52)
-        return fraction
+    f = struct.unpack('Q', struct.pack('d', x))[0]
+    fraction = f & 0xfffffffffffff
+    fraction /= (1 << 52)
+    return fraction
 
 def mantissa(x):
     # returns the full IEEE mantissa of x as a decimal floating-point number (which is the same as
     # fraction() + 1  for normalized numbers; same as fraction() for subnormals).
-    if(exponent(x) == 0):
-        man = fraction(x)
-        return man
-    if(exponent(x) != -1022):
-        man = fraction(x) + 1
-        return man
-    man = fraction(x)
-    return man
+    if x == 0:
+        return fraction(x)
+    return fraction(x) + 1
 
 def is_posinfinity(x):
     # returns true if x is positive infinity
-    return x == math.inf
+    exp = exponent(x)
+    man = mantissa(x)
+    si = sign(x)
+    if exp == 1024 and man == 1.0 and si == 1:
+        return True
+    return False
 
 def is_neginfinity(x):
     # returns true if x is negative infinity
-    return x == -math.inf
+    exp = exponent(x)
+    man = mantissa(x)
+    si = sign(x)
+    if exp == 1024 and man == 1.0 and si == -1:
+        return True
+    return False
 
 def ulp(x):
     # returns the magnitude of the spacing between x and its floating-point successor
-    return math.nextafter(x, math.inf) - x
+    y = math.nextafter(x, inf)
+    return y - x
 
 def ulps(x, y):
     # returns the number of intervals between x and y by taking advantage of the IEEE standard
-    return 
+    base = 2
+    tot_ulps = 0
+    exp_y = exponent(y)
+    exp_x = exponent(x)
+    tmp = exp_x
+    while True:
+        if tmp < exp_y:
+            if tmp == exp_x:
+                tot_ulps = ((base ** (exp_x + 1)) - x) / (eps * (base ** exp_x))
+            else:
+                tot_ulps += (base - 1) * (base ** (64 - 1))
+            tmp += 1
+        else:
+            tot_ulps += (y - (base ** exp_y)) / (eps * (base ** exp_y))
+            break
+    return tot_ulps
 
 def main():
     testIEEE()
