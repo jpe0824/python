@@ -1,10 +1,6 @@
 import math
 import numpy as np
 import struct
-import sys
-
-eps = sys.float_info.epsilon
-inf = math.inf
 
 test_pass = 0
 
@@ -43,35 +39,41 @@ def testIEEE():
     assertEquals(ulp(1.0e15),0.125) # 0.125
     assertEquals(ulps(1,2),4503599627370496) # 4503599627370496
 
+def unpack_pack(x):
+    return struct.unpack('Q',struct.pack('d', x))[0]
+
 def sign(x):
     # returns -1 if the x is negative, 0 if x is (either positive or negative) zero, 1 if x is positive.
-    if x == 0:
+    f = unpack_pack(x)
+    sign_bit = f >> 63
+    exp = exponent(x)
+    if exp == 0 and ((f & 0xfffffffffffff) == 0):
         return 0
-    if x < 0:
-        return -1
-    return 1
+    if sign_bit == 0:
+        return 1
+    return -1
 
 def exponent(x):
     # returns the unbiased (true) binary exponent of x as a decimal integer. Remember that
     # subnormals are a special case. Consider 0 to be a subnormal.
-    if x == 0:
+    f = unpack_pack(x)
+    e = (f >> 52) & 0x7ff
+
+    if e == 0 and ((f & 0xfffffffffffff) == 0):
         return 0
-    elif math.isnan(x) or math.isinf(x):
+    elif e == 0x7ff:
         return 1024
     else:
-        f = struct.unpack('Q', struct.pack('d', x))[0]
-        e = (f >> 52) & 0x7ff
         if e == 0:
             e = -1022
         else:
             e -= 1023
         return e
-    # pass
 
 def fraction(x):
     # returns the IEEE fractional part of x as a decimal floating-point number. You must convert
     # binary to decimal. The fraction portion does not include the leading 1 that is not stored.
-    f = struct.unpack('Q', struct.pack('d', x))[0]
+    f = unpack_pack(x)
     fraction = f & 0xfffffffffffff
     fraction /= (1 << 52)
     return fraction
@@ -103,27 +105,16 @@ def is_neginfinity(x):
 
 def ulp(x):
     # returns the magnitude of the spacing between x and its floating-point successor
-    y = math.nextafter(x, inf)
-    return y - x
+    f = unpack_pack(x)
+    next_f = f + 1 if f >= 0 else f - 1
+    next_x = struct.unpack('d', struct.pack('Q', next_f))[0]
+    return next_x - x
 
 def ulps(x, y):
     # returns the number of intervals between x and y by taking advantage of the IEEE standard
-    base = 2
-    tot_ulps = 0
-    exp_y = exponent(y)
-    exp_x = exponent(x)
-    tmp = exp_x
-    while True:
-        if tmp < exp_y:
-            if tmp == exp_x:
-                tot_ulps = ((base ** (exp_x + 1)) - x) / (eps * (base ** exp_x))
-            else:
-                tot_ulps += (base - 1) * (base ** (64 - 1))
-            tmp += 1
-        else:
-            tot_ulps += (y - (base ** exp_y)) / (eps * (base ** exp_y))
-            break
-    return tot_ulps
+    f_x = unpack_pack(x)
+    f_y = unpack_pack(y)
+    return abs(f_y - f_x)
 
 def main():
     testIEEE()
