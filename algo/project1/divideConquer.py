@@ -6,19 +6,23 @@ import csv
 counter = 0
 actualBasicOps = []
 elapsedTimes = []
-array1 = [random.randint(0,1000) for i in range(10)]
-array2 = [random.randint(0,1000) for i in range(100)]
-array3 = [random.randint(0,1000) for i in range(250)]
-array4 = [random.randint(0,1000) for i in range(500)]
+smallArray1 = [random.randint(0,1000) for i in range(5)]
+smallArray2 = [random.randint(0,1000) for i in range(10)]
+smallArray3 = [random.randint(0,1000) for i in range(15)]
+
+largeArray1 = [random.randint(0,1000) for i in range(100)]
+largeArray2 = [random.randint(0,1000) for i in range(250)]
+largeArray3 = [random.randint(0,1000) for i in range(500)]
 
 
-nTimes = [array1, array2, array3, array4]
+nTimes = [smallArray1, smallArray2, smallArray3, largeArray1, largeArray2, largeArray3]
+nTimesCopy = [smallArray1.copy(), smallArray2.copy(), smallArray3.copy(), largeArray1.copy(), largeArray2.copy(), largeArray3.copy()]
 
 def partition(array, low, high):
     global counter
     pivot = array[high]
     i = low - 1
-
+    #quicksort for loop
     for j in range(low, high):
         counter += 1
         if array[j] <= pivot:
@@ -51,6 +55,7 @@ def merge(a, b, c):
     i = j = k = 0
     n = len(b) + len(c)
     m = len(b)
+    #merge while loop w/ conditions
     while j < m and k < n - m:
         if b[j] <= c[k]:
             a[i] = b[j]
@@ -70,26 +75,35 @@ def runRecurs(func):
     global counter
     global actualBasicOps
     global nTimes
+    global nTimesCopy
     elapsedTimes = []
     counter = 0
     actualBasicOps = []
 
-    for n in nTimes:
-        counter = 0
-        t = time.perf_counter()
-        print(func.__name__)
-        if(func.__name__ == 'mergeSort'):
+    if func.__name__ == 'mergeSort':
+        for n in nTimes:
+            counter = 0
+            t = time.perf_counter()
+            print(func.__name__)
             funcName = func(n)
-        else:
+            timeDelta = time.perf_counter() - t
+            actualBasicOps.append(counter)
+            elapsedTimes.append(timeDelta)
+            print(f"(array length {len(n)}) in (calculated in {counter}) basicOps in {timeDelta}")
+
+    else:
+        for n in nTimesCopy:
+            counter = 0
+            t = time.perf_counter()
+            print(func.__name__)
             funcName = func(n, 0, len(n) - 1)
-        timeDelta = time.perf_counter() - t
-        actualBasicOps.append(counter)
-        elapsedTimes.append(timeDelta)
-        print(f"(array length {len(n)}) in (calculated in {counter}) basicOps in {timeDelta}")
+            timeDelta = time.perf_counter() - t
+            actualBasicOps.append(counter)
+            elapsedTimes.append(timeDelta)
+            print(f"(array length {len(n)}) in (calculated in {counter}) basicOps in {timeDelta}")
 
 def printData(nTimes, actualBasicOps, elapsedTimes, func):
-    print(f"Data for {func.__name__} function:")
-    c = 0 #constant we're trying to ascertain
+    c = 0
     sumOfItems = 0.0
     sumOfItemsSquared = 0.0
     sumOfItems2PowN = 0.0
@@ -98,10 +112,7 @@ def printData(nTimes, actualBasicOps, elapsedTimes, func):
     sumOfTimes = 0.0
     sumOfItemsGolden = 0.0
     estCsvData = []
-    actualCsvData = []
-    basicCsvData = []
 
-    # do calculations
     i = 0
     for n in nTimes:
         ln = len(n)
@@ -121,9 +132,8 @@ def printData(nTimes, actualBasicOps, elapsedTimes, func):
     cSq = sumOfTimes / sumOfItemsSquared
     cGolden = sumOfTimes / sumOfItemsGolden
     c2PowN = sumOfTimes / sumOfItems2PowN
-    header_est_times = ['n', 'c', 'cGolden', 'estimatedCNlgN', 'estimatedTimeLgN', 'estimatedTimeN', 'estimatedTimeNSq', 'estimated1.6^n', 'estimated2^n']
-    header_n_basic_ops = ['n', 'basicOps']
-    header_n_run_times = ['n', 'actualTimes']
+    header_est_times = ['n','basicOps', 'actualTimes', 'c', 'cGolden', 'estimatedCNlgN', 'estimatedTimeLgN', 'estimatedTimeN', 'estimatedTimeNSq', 'estimated1.6^n', 'estimated2^n']
+
     i = 0
     for n in nTimes:
         elapsedTime  = elapsedTimes[i]
@@ -134,30 +144,24 @@ def printData(nTimes, actualBasicOps, elapsedTimes, func):
         estimatedCNlgN = cNlgN * basicOperationCount
         estimatedGolden = cGolden * basicOperationCount
         estimated2PowN = c2PowN * basicOperationCount
-        estData = [len(n), c, cGolden, estimatedCNlgN, estimatedLgN, estimatedTime, estimatedTimeNSq, estimatedGolden, estimated2PowN]
-        basicOpsData = [len(n), basicOperationCount]
-        actualData = [len(n), elapsedTime]
+        estData = [len(n), basicOperationCount, elapsedTime, c, cGolden, estimatedCNlgN, estimatedLgN, estimatedTime, estimatedTimeNSq, estimatedGolden, estimated2PowN]
         estCsvData.append(estData)
-        basicCsvData.append(basicOpsData)
-        actualCsvData.append(actualData)
+
         i += 1
     with open(f'{func.__name__}.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(header_est_times)
         writer.writerows(estCsvData)
-        writer.writerow(header_n_basic_ops)
-        writer.writerows(basicCsvData)
-        writer.writerow(header_n_run_times)
-        writer.writerows(actualCsvData)
 
 def main():
     global elapsedTimes
     global actualBasicOps
     global nTimes
+    global nTimesCopy
     runRecurs(mergeSort)
     printData(nTimes, actualBasicOps, elapsedTimes, mergeSort)
     runRecurs(quickSort)
-    printData(nTimes, actualBasicOps, elapsedTimes, quickSort)
+    printData(nTimesCopy, actualBasicOps, elapsedTimes, quickSort)
 
 if __name__ == "__main__":
     main()
