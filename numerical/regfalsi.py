@@ -61,13 +61,17 @@ def func1(x):
 def func2(x):
     return (x ** 3) - (7 * x ** 2) + (15 * x) - 9
 
+def func3(x):
+    return 2 * x ** 3 - x - 7
+
 def main():
     lower1, lower2 = 1.5, 0
     upper1, upper2 = 2.5, 1.5
-    regFalsiResult(lower1, upper1, func1)
-    regFalsiResult(lower2, upper2, func1)
-    regFalsiResult(lower1, upper1, func2)
-    regFalsiResult(lower2, upper2, func2)
+    # regFalsiResult(lower1, upper1, func1)
+    # regFalsiResult(lower2, upper2, func1)
+    # regFalsiResult(lower1, upper1, func2)
+    # regFalsiResult(lower2, upper2, func2)
+    regFalsiResult(2,3, func3)
 
 if __name__ == '__main__':
     main()

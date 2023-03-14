@@ -1,4 +1,6 @@
-def bisect(func, xl, xu,maxit = 20):
+import math
+
+def bisect(func, xl, xu,maxit = 3):
     if func(xl)*func(xu)>0:
         return 'initial estimates do not bracket solution'
     for i in range(maxit):
@@ -31,11 +33,14 @@ def func2(x):
 def func3(x):
     return 71991 * ((x * ((1+x)**84))/(((1+x)**84) - 1)) - 1000
 
+def func4(x):
+    return x** .5 - math.cos(x)
+
 def main():
 
-    # print("Problem 1 ")
-    # print('Root est, lower guess, upper guess')
-    # print("bisect: 9, 10",bisect(func1,9,10))
+    print("Problem 1 ")
+    print('Root est, lower guess, upper guess')
+    print("bisect: 0, 1",bisect(func4,0,1))
     # print("falsepos: -11, -10",falsePos(func1,-11,-10))
 
     # print("Problem 2")
