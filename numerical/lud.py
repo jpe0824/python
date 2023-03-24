@@ -17,9 +17,7 @@ def solve(A, n, pivot, b, x):
     pass
 
 def readDatFile(fileName):
-    numRows = 0
     matrixRows = []
-    numRHS = 0
     rightHandSide = []
     with open(fileName, "r") as file:
         numRows = file.readline().strip().split('\n')[0]
