@@ -1,86 +1,69 @@
 import sys
-import numpy as np
 
 def factor(A, n, pivot):
     for k in range(n - 1):
-        # Find the index of the pivot row
-        i_max = np.argmax(np.abs(A[k:n, k])) + k
-
-        if A[i_max, k] == 0:
+        p = max(range(k, n), key=lambda i: abs(A[i][k]))
+        if A[p][k] == 0:
             return -1
+        #swap rows to pivot
+        if p != k:
+            A[k], A[p] = A[p], A[k]
+            pivot[k], pivot[p] = pivot[p], pivot[k]
 
-        # Swap rows to pivot
-        if i_max != k:
-            A[[i_max, k], k:n] = A[[k, i_max], k:n]
-            pivot[k], pivot[i_max] = pivot[i_max], pivot[k]
-
-        # Elimination
+        # elimination
         for i in range(k + 1, n):
-            factor = A[i, k] / A[k, k]
-            A[i, k:n] -= factor * A[k, k:n]
-            A[i, k] = factor
-
-    return 0
+            factor = A[i][k] / A[k][k]
+            A[i][k] = round(factor, 2)
+            for j in range(k + 1, n):
+                A[i][j] -= factor * A[k][j]
+                A[i][j] = round(A[i][j],2)
+    #print l/u
+    print("L/U = ", end='\t')
+    for i in range(n):
+        for j in range(n):
+            print(f'{A[i][j]:.2f}', end = '\t')
+        print('',end='\n\t')
+    print()
 
 def solve(A, n, pivot, b, x):
-    # Apply partial pivoting to b
-    for k in range(n - 1):
-        if pivot[k] != k:
-            b[k], b[pivot[k]] = b[pivot[k]], b[k]
-
-    # Forward substitution
-    for k in range(n):
-        x[k] = b[k] - np.dot(A[k, :k], x[:k])
-
-    # Backward substitution
-    for k in range(n - 1, -1, -1):
-        x[k] = (x[k] - np.dot(A[k, k + 1:n], x[k + 1:n])) / A[k, k]
+    # forward substitution
+    for i in range(n):
+        tot = sum(A[i][j] * x[j] for j in range(i))
+        x[i] = b[pivot[i]] - tot
+    # backward substitution
+    for i in range(n - 1, -1, -1):
+        tot = sum(A[i][j] * x[j] for j in range(i + 1, n))
+        x[i] = (x[i] - tot) / A[i][i]
 
 def main():
-    # Process input files
+    if(len(sys.argv[1:]) < 1):
+        print('Error:\n usage: lud.py lu1.dat lu2.dat')
     for filename in sys.argv[1:]:
         try:
             with open(filename, 'r') as f:
-                # Read rank of system
+                # read input data
                 n = int(f.readline())
-
-                # Read matrix A
-                A = np.zeros((n, n))
-                for i in range(n):
-                    A[i] = list(map(float, f.readline().split()))
-
-                # Read number of right-hand sides
+                A = [list(map(float, f.readline().split())) for _ in range(n)]
                 num_rhs = int(f.readline())
+                b_arr = [list(map(float, f.readline().split())) for _ in range(num_rhs)]
+                pivot = list(range(n))
+                x = [0] * n
 
-                print(f"File: {filename}:")
-                print("L\\U =")
-                for i in range(n):
-                    print(" ".join(f"{A[i, j]:.2f}" for j in range(n)))
+                # factorization
+                print(f'File {filename}:')
+                status = factor(A, n, pivot)
+                if status == -1:
+                    print(f"Error: {filename}, A matrix is singular")
+                    continue
 
-                # Process each right-hand side
-                for j in range(num_rhs):
-                    # Read right-hand side
-                    b = np.array(list(map(float, f.readline().split())))
-                    # Initialize pivot vector
-                    pivot = np.arange(n)
-
-                    # Factorize A
-                    status = factor(A, n, pivot)
-                    if status == -1:
-                        print(f"Error: singular matrix in file {filename}")
-                        break
-
-                    # Solve for x
-                    x = np.zeros(n)
+                #solving
+                for b in b_arr:
                     solve(A, n, pivot, b, x)
-
-                    # Print results
-
-                    print(f"b = {' '.join(f'{val:.2f}' for val in b)}")
-                    print(f"x = {' '.join(f'{val:.2f}' for val in x)}")
-
+                    print(f"b = {'  '.join(f'{val:.2f}' for val in b)}")
+                    print(f"x = {'  '.join(f'{val:.2f}' for val in x)}")
+                print('\n')
         except FileNotFoundError:
-            print(f"Error: file {filename} not found")
+            print(f"Error: {filename} not found")
 
 if __name__ == '__main__':
     main()
