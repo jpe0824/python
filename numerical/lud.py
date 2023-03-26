@@ -1,85 +1,86 @@
+import sys
 import numpy as np
 
 def factor(A, n, pivot):
-    """
-    a. A is the square matrix of coefficients
-    b. n is the rank (number of rows/columns) of A
-    c. pivot is an output vector that records the partial pivoting swaps
-    """
-    pass
+    for k in range(n - 1):
+        # Find the index of the pivot row
+        i_max = np.argmax(np.abs(A[k:n, k])) + k
+
+        if A[i_max, k] == 0:
+            return -1
+
+        # Swap rows to pivot
+        if i_max != k:
+            A[[i_max, k], k:n] = A[[k, i_max], k:n]
+            pivot[k], pivot[i_max] = pivot[i_max], pivot[k]
+
+        # Elimination
+        for i in range(k + 1, n):
+            factor = A[i, k] / A[k, k]
+            A[i, k:n] -= factor * A[k, k:n]
+            A[i, k] = factor
+
+    return 0
 
 def solve(A, n, pivot, b, x):
-    """
-    a. A, n and pivot are from factor() (A is overwritten with its own LU factorization)
-    b. b is a right-hand side to solve for
-    c. x is an output vector with the solution of Ax = b
-    """
-    pass
+    # Apply partial pivoting to b
+    for k in range(n - 1):
+        if pivot[k] != k:
+            b[k], b[pivot[k]] = b[pivot[k]], b[k]
 
-def readDatFile(fileName):
-    matrixRows = []
-    rightHandSide = []
-    with open(fileName, "r") as file:
-        numRows = file.readline().strip().split('\n')[0]
-        for _ in range(int(numRows)):
-            line = file.readline().strip().split(' ')
-            matrixRows.append(list(map(int, line)))
-        numRHS = file.readline().strip().split('\n')[0]
-        for _ in range(int(numRHS)):
-            line = file.readline().strip().split(' ')
-            rightHandSide.append(list(map(int, line)))
+    # Forward substitution
+    for k in range(n):
+        x[k] = b[k] - np.dot(A[k, :k], x[:k])
 
-    return matrixRows, rightHandSide
-
+    # Backward substitution
+    for k in range(n - 1, -1, -1):
+        x[k] = (x[k] - np.dot(A[k, k + 1:n], x[k + 1:n])) / A[k, k]
 
 def main():
-    """
-    Input:
-    <rank of system (number of rows)>
-    <the rows of the matrix, a>
-    <number of right-hand sides>
-    <the right hand sides>
-    File lu1.dat:
-    3
-    10 -7 0
-    -3 2 6
-    5 -1 5
-    2
-    7 4 6
-    3 5 9
-    File lu2.dat:
-    4
-    5 3 -1 0
-    2 0 4 1
-    -3 3 -3 5
-    0 6 -2 3
-    2
-    11 1 -2 9
-    7 7 2 7
+    # Process input files
+    for filename in sys.argv[1:]:
+        try:
+            with open(filename, 'r') as f:
+                # Read rank of system
+                n = int(f.readline())
 
-    Output
-    System Prompt\> prog6 lu1.dat lu2.dat
-    File lu1.dat:
-    L\\U = 10.00 -7.00 0.00
-    0.50 2.50 5.00
-    -0.30 -0.04 6.20
-    b = 7.00 4.00 6.00
-    x = 0.00 -1.00 1.00
-    b = 3.00 5.00 9.00
-    x = 1.00 1.00 1.00
-    File lu2.dat:
-    L\\U =5.00 3.00 -1.00 0.00
-    0.00 6.00 -2.00 3.00
-    0.40 -0.20 4.00 1.60
-    -0.60 0.80 -0.50 3.40
-    b = 11.00 1.00 -2.00 9.00
-    x = 1.00 2.00 -0.00 -1.00
-    b = 7.00 7.00 2.00 7.00
-    x = 1.00 1.00 1.00 1.00
-    """
+                # Read matrix A
+                A = np.zeros((n, n))
+                for i in range(n):
+                    A[i] = list(map(float, f.readline().split()))
 
-    lu1MatrixRows, lu1RHS = readDatFile("numerical/lu1.dat")
-    print(lu1MatrixRows, lu1RHS)
+                # Read number of right-hand sides
+                num_rhs = int(f.readline())
 
-if __name__ == "__main__":
+                print(f"File: {filename}:")
+                print("L\\U =")
+                for i in range(n):
+                    print(" ".join(f"{A[i, j]:.2f}" for j in range(n)))
+
+                # Process each right-hand side
+                for j in range(num_rhs):
+                    # Read right-hand side
+                    b = np.array(list(map(float, f.readline().split())))
+                    # Initialize pivot vector
+                    pivot = np.arange(n)
+
+                    # Factorize A
+                    status = factor(A, n, pivot)
+                    if status == -1:
+                        print(f"Error: singular matrix in file {filename}")
+                        break
+
+                    # Solve for x
+                    x = np.zeros(n)
+                    solve(A, n, pivot, b, x)
+
+                    # Print results
+
+                    print(f"b = {' '.join(f'{val:.2f}' for val in b)}")
+                    print(f"x = {' '.join(f'{val:.2f}' for val in x)}")
+
+        except FileNotFoundError:
+            print(f"Error: file {filename} not found")
+
+if __name__ == '__main__':
     main()
