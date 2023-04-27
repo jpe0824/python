@@ -1,10 +1,5 @@
 import numpy as np
-
-
-
-
-
-
+from random import randint
 
 """
     using the Sieve of Eratosthenes, please calculate prime numbers < 2^17
@@ -66,9 +61,10 @@ modulo_number used to calculate d and e will be (p-1)*(q-1)
 function should return d, e; function should use extended euclidian algorithm
 """
 def get_keys(p, q):
+    global primes
     n = p * q
     phi = (p-1) * (q-1)
-    e = 65537  # a common value for e
+    e = primes[randint(0,len(primes))]
     gcd, d, _ = gcd_ex(e, phi)
     while d < 0:
         d += phi
