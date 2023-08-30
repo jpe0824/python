@@ -8,8 +8,10 @@ with open("gas_prices.txt", "r") as file:
         month, _, year = date.split("-")
         data_by_year[year].append((float(price), month))
 
-for year, data in sorted(data_by_year.items()):
-    data.sort(key=lambda x: x[1])
+# print(data_by_year)
+
+# for year, data in sorted(data_by_year.items()):
+#     data.sort(key=lambda x: x[1])
 
 def calculate_stats(data):
     low = min(data)[0]
@@ -17,19 +19,29 @@ def calculate_stats(data):
     average = sum(price for price, _ in data) / len(data)
     return low, average, high
 
-month_names = [
-    None, "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-]
+month_names = {
+    "01":"January",
+    "02":"February",
+    "03":"March",
+    "04":"April",
+    "05":"May",
+    "06":"June",
+    "07":"July",
+    "08":"August",
+    "09":"September",
+    "10":"October",
+    "11":"November",
+    "12":"December"
+}
 
 # Write the report to the output file
-with open("gas_report.txt", "w") as output_file:
-    for year, data in sorted(data_by_year.items()):
-        low, average, high = calculate_stats(data)
-        output_file.write(f"{year}:\n")
-        output_file.write(f"    Low: ${low:.2f}, Avg: ${average:.2f}, High: ${high:.2f}\n")
+for year, data in sorted(data_by_year.items()):
+    low, average, high = calculate_stats(data)
+    print(f"{year}:\n")
+    print(f"\tLow: ${low:.2f}, Avg: ${average:.2f}, High: ${high:.2f}\n")
 
-        # Create a dictionary to store month average prices
-        #TODO - get month and their average here
+    # Create a dictionary to store month average prices
+    #TODO - get month and their average here
+    print(data)
 
-        output_file.write("\n")
+    print("\n")
