@@ -15,28 +15,18 @@ def calculate_stats(data):
     return low, average, high
 
 month_names = {
-    "01":"January",
-    "02":"February",
-    "03":"March",
-    "04":"April",
-    "05":"May\t",
-    "06":"June\t",
-    "07":"July\t",
-    "08":"August",
-    "09":"September",
-    "10":"October",
-    "11":"November",
-    "12":"December"
+    "01":"January","02":"February","03":"March","04":"April",
+    "05":"May","06":"June","07":"July","08":"August",
+    "09":"September","10":"October","11":"November","12":"December"
 }
 
 # Initialize a dictionary to store month-wise averages
 month_averages = {month: [] for month in month_names}
 
-# Write the report to the output file
 for year, data in sorted(data_by_year.items()):
     low, average, high = calculate_stats(data)
     print(f"{year}:")
-    print(f"   Low: ${low:.2f}, Avg: ${average:.2f}, High: ${high:.2f}")
+    print(f"    Low: ${low:.2f}, Avg: ${average:.2f}, High: ${high:.2f}")
 
     # Calculate month-wise averages and store them
     for price, month in data:
@@ -46,4 +36,4 @@ for year, data in sorted(data_by_year.items()):
     for month, prices in sorted(month_averages.items()):
         month_name = month_names[month]
         month_average = sum(prices) / len(prices)
-        print(f"   {month_name}\t ${month_average:.2f}")
+        print(f"    {month_name:{12}}${month_average:.2f}")
