@@ -20,18 +20,15 @@ month_names = {
     "09":"September","10":"October","11":"November","12":"December"
 }
 
-# Initialize a dictionary to store month-wise averages
-month_averages = {month: [] for month in month_names}
-
 for year, data in sorted(data_by_year.items()):
     low, average, high = calculate_stats(data)
     print(f"{year}:")
     print(f"    Low: ${low:.2f}, Avg: ${average:.2f}, High: ${high:.2f}")
-
+    # Initialize a dictionary to store month-wise averages
+    month_averages = {month: [] for month in month_names}
     # Calculate month-wise averages and store them
     for price, month in data:
         month_averages[month].append(price)
-
     # Print month-wise averages
     for month, prices in sorted(month_averages.items()):
         month_name = month_names[month]
