@@ -1,6 +1,6 @@
 {'Adams'}
-{'Blake', 'Adams', 'Jones'}
+{'Adams', 'Jones', 'Blake'}
 {'Blake'}
-{('Bolt', 'Green'), ('Cam', 'Blue'), ('Screw', 'Red'), ('Cog', 'Red'), ('Nut', 'Red')}
-{('Jones', 'Blake'), ('Smith', 'Clark'), ('Clark', 'Smith'), ('Blake', 'Jones')}
-{'London': {'Smith', 'Clark'}, 'Paris': {'Blake', 'Jones'}, 'Athens': {'Adams'}}
+{('Bolt', 'Green'), ('Cog', 'Red'), ('Screw', 'Red'), ('Cam', 'Blue'), ('Nut', 'Red')}
+{('Blake', 'Jones'), ('Clark', 'Smith')}
+{'London': {'Clark', 'Smith'}, 'Paris': {'Jones', 'Blake'}, 'Athens': {'Adams'}}
