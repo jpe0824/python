@@ -1,6 +1,17 @@
 
 class Customer():
     pass
+    def __init__(self,cust_id: int,name: str,
+                street: str,city: str,state: str,
+                zip: str,phone: str,email: str):
+        self.cust_id = cust_id
+        self.name = name
+        self.street = street
+        self.city = city
+        self.state = state
+        self.zip = zip
+        self.phone = phone
+        self.email = email
 
     def read_customers(file):
         pass
