@@ -1,47 +1,4 @@
 
-# class Customer():
-#     def __init__(self,cust_id: int,name: str,
-#                 street: str,city: str,state: str,
-#                 zip: str,phone: str,email: str):
-#         self.cust_id = cust_id
-#         self.name = name
-#         self.street = street
-#         self.city = city
-#         self.state = state
-#         self.zip = zip
-#         self.phone = phone
-#         self.email = email
-
-#     def read_customers(file):
-#         pass
-
-# class Item():
-#     pass
-
-#     def read_items(file):
-#         pass
-
-# class Order():
-#     def __init__(self, order_id: int, order_date, cust_id: int, line_items: list, payment: Payment) -> None:
-#         pass
-
-#     def read_orders(file):
-#         pass
-
-# class Payment():
-#     pass
-
-# class LineItem():
-#     pass
-
-# def main():
-#     Customer.read_customers("customers.txt")
-#     Item.read_items("items.txt")
-#     Order.read_orders("orders.txt")
-
-# if __name__ == '__main__':
-#     main()
-#     # Now print orders to the file order_report.txt
 
 from dataclasses import dataclass, field
 from typing import Dict, List
@@ -64,7 +21,7 @@ class Customer:
         return f"{self.name}, ph. {self.phone}, email: {self.email}\n{self.street}\n{self.city}, {self.state} {self.zip_code}"
 
     @classmethod
-    def read_customers(filename: str):
+    def read_customers(self, filename: str):
         with open(filename, 'r') as file:
             for line in file:
                 fields = line.strip().split(',')
@@ -80,7 +37,7 @@ class Item:
     items: Dict[int, 'Item'] = field(default_factory=dict)
 
     @staticmethod
-    def read_items(filename: str):
+    def read_items(self, filename: str):
         with open(filename, 'r') as file:
             for line in file:
                 fields = line.strip().split(',')
@@ -138,7 +95,7 @@ class Order:
         return sum(Item.items[line.item_id].price * line.quantity for line in self.line_items)
 
     @staticmethod
-    def read_orders(filename: str):
+    def read_orders(self, filename: str):
         with open(filename, 'r') as file:
             lines = file.readlines()
             for i in range(0, len(lines), 2):
