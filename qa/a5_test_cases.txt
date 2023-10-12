@@ -1,0 +1,26 @@
+# Test 1: Wile there are lines to read, process lines
+# Expected Result: Should process whole doc
+# Processing tests...
+# Test 2: Test for a comment
+# Expected Result: Should print: "Print this line"
+# Print this line
+# Following tests will test for triangle validity
+# Test 3: Test for lengths all 0's
+# Expected Result: Should print: "Not a triangle"
+0 0 0
+# Test 4: Test for lengths with negative numbers
+# Expected Result: Should print: "Not a triangle"
+-5 19 -50
+# Test 5: Test for triangle inequality
+# Expected Result: Should print: "Not a triangle"
+3 3 10
+# Following tests will test for triangle type
+# Test 6: Test for equilateral triangle
+# Expected Result: Should print: "Equilateral"
+3 3 3
+# Test 7: Test for isosceles triangle
+# Expected Result: Should print: "Isosceles"
+3 3 4
+# Test 8: Test for scalene triangle
+# Expected Result: Should print: "Scalene"
+3 4 5
