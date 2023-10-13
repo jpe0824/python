@@ -2,7 +2,7 @@
 # Expected Result: Should process whole doc
 # Processing tests...
 # Test 2: Test for a comment
-# Expected Result: Should print: "Print this line"
+# Expected Result: Should print: "# Print this line"
 # Print this line
 # Following tests will test for triangle validity
 # Test 3: Test for lengths all 0's
