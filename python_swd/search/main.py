@@ -1,68 +1,72 @@
-import re
 import requests
+import re
 import pprint
-from urllib.parse import urljoin
-
 class HayStack:
-    def __init__(self, url, depth=3):
-        self.url = url
+    def __init__(self, url, depth = 3):
         self.depth = depth
+        self.session = requests.Session()
+        self.session.headers.update({'User-Agent': 'XY'})
+        self.word_re = re.compile(r'[A-z|\']+')
+        self.url_re = re.compile(r'href *= *"[^"]*"')
         self.index = {}
         self.graph = {}
         self.ranks = {}
         self.crawl(url)
         self.compute_ranks(self.graph)
 
+    def lookup(self, word):
+        word = word.lower()
+        result = []
+        if word in self.index:
+            url_rank_pairs = [(url, self.ranks[url]) for url in self.index[word]]
+            url_rank_pairs.sort(key=lambda pair: pair[1], reverse=True)
+            result = [pair[0] for pair in url_rank_pairs]
+        return result
+
     def crawl(self, url, depth=0):
         if depth == self.depth:
             return
-        content = requests.get(url, headers={"User-Agent": "XY"}).text
-        found_urls = re.findall('<a href="(.*?)"', content)
-        words = re.findall(r'\b\w+\b', re.sub('<[^<]+?>', '', content))
 
+        content = self.session.get(url).text
+
+        text = re.sub(r'<[^>]*>|\t|\n|&[a-z]*;', ' ', content)
+        words = self.word_re.findall(text)
         for word in words:
             word = word.lower()
-            if word.isdigit() and len(word) == 1 or word == '':
-                continue  # Skip single-digit numbers and empty strings
             if word not in self.index:
-                self.index[word] = set()
-            self.index[word].add(url)
+                self.index[word] = [url]
+            elif url not in self.index[word]:
+                self.index[word].append(url)
 
-        for found_url in found_urls:
-            if not found_url.startswith('http'):
-                absolute_url = urljoin(url, found_url)
-            else:
-                absolute_url = found_url
-            if url not in self.graph:
-                self.graph[url] = set()
-            self.graph[url].add(absolute_url)
-            self.crawl(absolute_url, depth + 1)
+        found_urls = self.url_re.findall(content)
+        page_urls = set()
+        for item in found_urls:
+            new_url = item.split('"')[1]
+            if new_url not in page_urls:
+                page_urls.add(new_url)
+        self.graph[url] = page_urls
+
+        for item in page_urls:
+            if item not in self.graph:
+                self.crawl(item, depth - 1)
 
     def compute_ranks(self, graph):
-        d = 0.85     # probability that surfer will bail
+        d = 0.85 # probability that surfer will bail
         numloops = 10
-
         ranks = {}
         npages = len(graph)
         for page in graph:
             ranks[page] = 1.0 / npages
-
-        for _ in range(0, numloops):
+        for i in range(0, numloops):
             newranks = {}
             for page in graph:
                 newrank = (1 - d) / npages
                 for url in graph:
-                    if page in graph[url]:  # this url links to page
+                    if page in graph[url]: # this url links to page
                         newrank += d*ranks[url]/len(graph[url])
                 newranks[page] = newrank
             ranks = newranks
         self.ranks = ranks
-
-    def lookup(self, keyword):
-        keyword = keyword.lower()
-        if keyword in self.index:
-            return sorted(self.index[keyword], key=lambda url: self.ranks[url], reverse=True)
-        return []
 
 if __name__ == '__main__':
     engine = HayStack('http://roversgame.net/cs3270/page1.html',4)
