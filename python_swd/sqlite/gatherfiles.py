@@ -11,11 +11,9 @@ def main():
     database = sys.argv[1]
     extensions = sys.argv[2:]
 
-    # Connect to SQLite database
     conn = sqlite3.connect(database)
     c = conn.cursor()
 
-    # For each extension, retrieve file information and add to zip file
     for ext in extensions:
         c.execute("SELECT * FROM files WHERE ext LIKE ?", (ext,))
         rows = c.fetchall()

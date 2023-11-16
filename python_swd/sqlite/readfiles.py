@@ -10,7 +10,6 @@ def main():
 
     directory = sys.argv[1]
 
-    # Connect to SQLite database and create table
     conn = sqlite3.connect('files.db')
     c = conn.cursor()
     c.execute('''
@@ -21,21 +20,15 @@ def main():
         )
     ''')
 
-    # Traverse directory tree and insert file information into database
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if '.' in file:
+            if '.' in file and not file.startswith(('.', '_')):
                 ext = file.split('.')[-1]
                 path = Path(root).resolve()
                 c.execute("INSERT INTO files VALUES (?, ?, ?)", (ext, str(path), file))
 
-    # Commit changes and close connection
     conn.commit()
-    conn.close()
 
-    # Query database and write results to text file
-    conn = sqlite3.connect('files.db')
-    c = conn.cursor()
     rows = c.execute("SELECT * FROM files").fetchall()
     with open('files-part1.txt', 'w') as f:
         for row in rows:
