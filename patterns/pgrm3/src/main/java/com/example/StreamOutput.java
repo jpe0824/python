@@ -12,6 +12,7 @@ class StreamOutput implements Output {
     public void write(Object o) {
         try {
             sink.write(o.toString());
+            sink.write("\n"); // Add a new line here
             sink.flush();
         } catch (IOException ex) {
             throw new RuntimeException(ex);

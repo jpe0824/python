@@ -29,7 +29,9 @@ public class Main {
             System.out.println("2. NumberedOutput");
             System.out.println("3. TeeOutput");
             System.out.println("4. FilterOutput");
-            System.out.println("5. Exit");
+            System.out.println("5. Insert on line");
+            System.out.println("6. Insert Markdown");
+            System.out.println("7. Exit");
 
             // Apply the selected decorators
             Output decoratedOutput = streamOutput;
@@ -71,7 +73,52 @@ public class Main {
                                 break;
                         }
                         break;
-                    case  5:
+                    case 5:
+                        System.out.print("Enter the line number to insert on: ");
+                        int lineNumber = Integer.parseInt(inputScanner.nextLine());
+                        System.out.print("Enter the text to insert: ");
+                        String insertText = inputScanner.nextLine();
+                        decoratedOutput = new InsertOnLineOutput(decoratedOutput, lineNumber, insertText);
+                        break;
+                    case 6:
+                        System.out.print("Enter option: \n");
+                        System.out.println("1. Insert Header 1");
+                        System.out.println("2. Insert Header 2");
+                        System.out.println("3. Insert Code Block");
+                        System.out.println("4. Insert Unordered List");
+                        int option = Integer.parseInt(inputScanner.nextLine());
+                        System.out.print("Enter the start line: ");
+                        int startLine = Integer.parseInt(inputScanner.nextLine());
+                        int endLine = startLine;
+                        String language = "";
+                        if (option == 3) {
+                            System.out.print("Enter the end line: ");
+                            endLine = Integer.parseInt(inputScanner.nextLine());
+                            System.out.print("Enter the language: ");
+                            language = inputScanner.nextLine();
+                        }
+
+                        String insertMDText;
+                        switch (option) {
+                            case 1:
+                                insertMDText = "# ";
+                                break;
+                            case 2:
+                                insertMDText = "## ";
+                                break;
+                            case 3:
+                                insertMDText = "``` " + language + " ";
+                                break;
+                            case 4:
+                                insertMDText = "* ";
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Invalid option");
+                        }
+
+                        decoratedOutput = new InsertMarkdownOutput(decoratedOutput, option, startLine, endLine, insertMDText);
+                        break;
+                    case 7:
                         System.out.println("Exiting...");
                         exit = true;
                         break;

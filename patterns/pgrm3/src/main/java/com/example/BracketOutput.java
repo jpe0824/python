@@ -9,7 +9,7 @@ public class BracketOutput implements Output {
 
     @Override
     public void write(Object o) {
-        String s = ("[" + o.toString() + "]\n");
+        String s = ("[" + o.toString() + "]");
         delegate.write(s);
     }
 }
