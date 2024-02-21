@@ -1,25 +1,28 @@
 package com.example;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
+// import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
     try {
             // Prompt for a file to read, default to decorator.dat
-            System.out.print("Enter the file to read (default is decorator.dat): ");
-            String inputFileName = System.console().readLine();
+            Scanner inputScanner = new Scanner(System.in);
+            System.out.print("Enter the file path to read (default is ./decorator.dat): ");
+            String inputFileName = inputScanner.nextLine().trim();
             if (inputFileName.isEmpty()) {
                 inputFileName = "./decorator.dat";
             }
-            BufferedReader reader = new BufferedReader(new FileReader(inputFileName));
-
             // Create a StreamOutput instance to write to output.txt
-            Output streamOutput = new StreamOutput(new PrintWriter(new FileWriter("./output.txt")));
+            Writer outputWriter = new FileWriter("output.txt");
+            Output streamOutput = new StreamOutput(new PrintWriter(outputWriter));
             // Present a menu of decorations
             System.out.println("Select decorations:");
             System.out.println("1. BracketOutput");
@@ -33,7 +36,7 @@ public class Main {
             boolean exit = false;
             while (!exit) {
                 System.out.print("Enter your choice: ");
-                int choice = Integer.parseInt(System.console().readLine());
+                int choice = Integer.parseInt(inputScanner.nextLine());
                 switch (choice) {
                     case  1:
                         decoratedOutput = new BracketOutput(decoratedOutput);
@@ -43,7 +46,8 @@ public class Main {
                         break;
                     case  3:
                         System.out.print("Enter the file for TeeOutput: ");
-                        Writer teeWriter = new PrintWriter(System.console().readLine());
+                        String teeFileName = inputScanner.nextLine().trim();
+                        Writer teeWriter = new PrintWriter(new FileWriter(teeFileName));
                         decoratedOutput = new TeeOutput(decoratedOutput, new StreamOutput(teeWriter));
                         break;
                     case  4:
@@ -76,13 +80,17 @@ public class Main {
                 }
             }
 
+            inputScanner.close();
 
-            // Read the file and apply the decorators
+            FileInputStream fstream = new FileInputStream(inputFileName);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fstream));
+
             String line;
+
             while ((line = reader.readLine()) != null) {
                 decoratedOutput.write(line);
             }
-            // Close the reader
+
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();

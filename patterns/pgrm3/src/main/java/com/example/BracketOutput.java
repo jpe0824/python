@@ -10,13 +10,6 @@ public class BracketOutput implements Output {
     @Override
     public void write(Object o) {
         String s = ("[" + o.toString() + "]\n");
-        writeString(s);
-    }
-
-    public void writeString(String s) {
-        delegate.write("[" + s + "]\n");
-    }
-    public void print(String s) {
-        System.out.println("[" + s + "]");
+        delegate.write(s);
     }
 }

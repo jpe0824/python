@@ -12,5 +12,6 @@ public class NumberedOutput implements Output {
     public void write(Object o) {
         String line = String.format("%5d: %s", lineNumber++, o.toString());
         delegate.write(line);
+        delegate.write("\n");
     }
 }

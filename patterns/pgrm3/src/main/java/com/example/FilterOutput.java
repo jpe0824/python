@@ -13,10 +13,7 @@ public class FilterOutput implements Output {
     public void write(Object o) {
         if (predicate.execute(o)) {
             delegate.write(o);
+            delegate.write("\n");
         }
     }
-
-    // public void print(String s) {
-    //     System.out.println("[" + s + "]");
-    // }
 }
