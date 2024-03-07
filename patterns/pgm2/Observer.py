@@ -1,16 +1,13 @@
 import abc
-
 class Observer(abc.ABC):
     @abc.abstractmethod
     def update(self, snapshot, timestamp):
         pass
-
 class AverageObserver(Observer):
     def update(self, snapshot, timestamp):
         avg_price = sum(stock['current_price'] for stock in snapshot) / len(snapshot)
         with open('data/Average.dat', 'a') as f:
             f.write(f'{timestamp}, Average price: {avg_price}\n')
-
 class HighLowObserver(Observer):
     def update(self, snapshot, timestamp):
         with open('data/HighLow.dat', 'a') as f:
@@ -27,8 +24,6 @@ class HighLowObserver(Observer):
                     """
                     f.write(f'{stock["ticker"]}: {stock["current_price"]}, {stock["52_week_high"]}, {stock["52_week_low"]}\n')
             f.write('\n')
-
-
 class SelectionObserver(Observer):
     def update(self, snapshot, timestamp):
         selected_tickers = ['ALL', 'BA', 'BC', 'GBEL', 'KFT', 'MCD', 'TR', 'WAG']

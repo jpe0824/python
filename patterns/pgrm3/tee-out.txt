@@ -1,0 +1,16 @@
+hierarchy (in this case, a Shape hierarchy): 
+
+class Shape(object):
+  	
+    @classmethod
+    def _incr(cls):
+      
+    @classmethod
+    def showCount(cls):
+        
+    def __init__(self):		# A constructor
+        self._incr()
+
+class Line(Shape): pass		# Ditto
+
+

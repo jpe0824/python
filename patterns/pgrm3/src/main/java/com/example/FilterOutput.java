@@ -15,8 +15,4 @@ public class FilterOutput implements Output {
             delegate.write(o);
         }
     }
-
-    // public void print(String s) {
-    //     System.out.println("[" + s + "]");
-    // }
 }

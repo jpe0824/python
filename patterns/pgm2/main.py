@@ -1,5 +1,4 @@
 from Observer import AverageObserver, HighLowObserver, SelectionObserver
-
 class LocalStock:
     def __init__(self):
         self.observers = []
