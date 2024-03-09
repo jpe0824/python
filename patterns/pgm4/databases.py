@@ -1,4 +1,7 @@
 class Database:
+    """
+    Simple database implementation
+    """
     def __init__(self, id) -> None:
         self.id = id
         self.data = {}
@@ -24,7 +27,8 @@ class Database:
             raise ValueError(f'Key {key} does not exist')
         del self.data[key]
 
-    def display(self):
-        print(f'Database {self.id}:')
+    def display(self, show_db_id=False):
+        if show_db_id:
+            print(f'Database {self.id}:')
         for key, value in self.data.items():
             print(f'{key}| {value}')

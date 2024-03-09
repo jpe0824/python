@@ -1,6 +1,13 @@
 from abc import ABC, abstractmethod
-
 class Command(ABC):
+    """
+    Abstract class for command pattern
+    """
+    def __init__(self, db, key, value=None) -> None:
+        self.db = db
+        self.key = key
+        self.value = value
+
     @abstractmethod
     def execute(self, database):
         pass
@@ -9,52 +16,63 @@ class Command(ABC):
     def undo(self, database):
         pass
 
+    def __str__(self):
+        return f"{self.__class__.__name__}"
 class AddCommand(Command):
-    def __init__(self, key, value) -> None:
-        self.key = key
-        self.value = value
+    """
+    Concrete command class for adding a key-value pair to a database
+    """
+    def execute(self):
+        self.db.add(self.key, self.value)
 
-    def execute(self, database):
-        database.add(self.key, self.value)
-
-    def undo(self, database):
-        database.remove(self.key)
-
+    def undo(self):
+        self.db.remove(self.key)
+        print(f"Undid {self.__str__()}")
+        self.db.display()
 class UpdateCommand(Command):
-    def __init__(self, key, value) -> None:
-        self.key = key
-        self.value = value
-        self.old_value = None
+    """
+    Concrete command class for updating a key-value pair in a database
+    """
+    def execute(self):
+        self.old_value = self.db.get(self.key)
+        self.db.update(self.key, self.value)
 
-    def execute(self, database):
-        self.old_value = database.get(self.key)
-        database.update(self.key, self.value)
-
-    def undo(self, database):
-        database.update(self.key, self.old_value)
-
+    def undo(self):
+        self.db.update(self.key, self.old_value)
+        print(f"Undid {self.__str__()}")
+        self.db.display()
 class RemoveCommand(Command):
-    def __init__(self, key) -> None:
-        self.key = key
-        self.value = None
+    """
+    Concrete command class for removing a key-value pair from a database
+    """
+    def execute(self):
+        self.old_value = self.db.get(self.key)
+        self.db.remove(self.key)
+    def undo(self):
+        self.db.add(self.key, self.old_value)
+        print(f"Undid {self.__str__()}")
+        self.db.display()
+class MacroCommand(Command):
+    """
+    Concrete command class for executing and undoing a sequence of commands
+    """
+    def __init__(self) -> None:
+        self.commands = []
 
-    def execute(self, database):
-        self.value = database.get(self.key)
-        database.remove(self.key)
+    def add(self, command):
+        self.commands.append(command)
 
-    def undo(self, database):
-        database.add(self.key, self.value)
+    def execute(self):
+        print("Beginning a macro")
+        for command in self.commands:
+            command.execute()
+        print("Ending a macro\n")
 
-class BeginTransactionCommand(Command):
-    def execute(self, database):
-        pass # No action needed
-
-    def undo(self, database):
-        pass # No action needed
-
-class EndTransactionCommand(Command):
-    def execute(self, database):
-        pass # No action needed
-
-    def undo(self, database):
-        pass # No action needed
+    def undo(self):
+        print("Begin Undoing macro\n")
+        for command in reversed(self.commands):
+            command.undo()
+            print(f"\nUndid {command.__str__()}")
+            command.db.display()
+            print("")
+        print("End Undoing macro")
