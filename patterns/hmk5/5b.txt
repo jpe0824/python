@@ -1,0 +1,5 @@
+b. In order to decouple the application from the database, we could use the Adapter pattern.
+It would allow us to abstract the details of how data is accessed from the database.
+- We would start with an interface with methods like addEmp, getEmp, updateEmp, and deleteEmp.
+- Then we implement an adapter class to implement the interface and use the database API to perform the operations.
+- Finally we use the adapter class in our application to perform the operations.
