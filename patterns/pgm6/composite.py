@@ -20,7 +20,7 @@ class Component:
     def up(self):
         pass
 
-def File(Component):
+class File(Component):
     def __init__(self, name):
         self.name = name
 
