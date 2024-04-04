@@ -28,7 +28,7 @@ class File(Component):
         return self.name
 
     def list_all(self, depth = 0):
-        return f"{'  ' * depth}{self.name}\n"
+        return f"{'   ' * depth}{self.name}\n"
 
     def count_files(self):
         return 1
@@ -43,8 +43,8 @@ class Directory(Component):
     def list(self):
         return ', '.join(file.name for file in self.files if isinstance(file, File) or isinstance(file, Directory))
 
-    def list_all(self, depth=0):
-        result = f"{'  ' * depth}{self.name}:\n"
+    def list_all(self, depth = 0):
+        result = f"{'   ' * depth}{self.name}:\n"
         for file in self.files:
             print(f"Depth: {depth}, File: {file.name}") # Debugging line
             result += file.list_all(depth + 1)
